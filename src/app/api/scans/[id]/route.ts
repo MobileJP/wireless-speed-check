@@ -8,6 +8,6 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  deleteScan(id);
+  await deleteScan(id);
   return NextResponse.json({ ok: true });
 }

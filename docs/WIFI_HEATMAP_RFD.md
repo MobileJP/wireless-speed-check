@@ -245,6 +245,7 @@ After review, this was re-scoped from React Native/Expo to a **Windows-only loca
 - iOS has no public API for WiFi signal strength (`NEHotspotHelper` requires an Apple entitlement not obtainable for this use case) — a hard platform wall, not a complexity issue.
 - Android RSSI access needs a custom native module (Expo Go can't run it; would need an EAS dev build) plus `ACCESS_FINE_LOCATION` and is throttled to ~4 scans/2min on Android 10+.
 - Windows exposes WiFi signal (`netsh wlan show interfaces`) with no special permissions and no throttling, and this machine is a Windows laptop — so the app runs locally via `npm run dev` and reads signal strength by shelling out to `netsh`.
-- Google Sheets sync uses a real OAuth 2.0 "web application" flow (Node's `googleapis`), with the Next.js server itself handling the OAuth redirect, rather than Apps Script or a mobile OAuth flow.
+- Storage moved from local SQLite (per the original RFD) to a Neon Postgres database.
+- Google Sheets sync (originally OAuth 2.0 via Node's `googleapis`) was dropped entirely in favor of a **CSV export** button on the History page — simpler, no Google Cloud/OAuth setup required, and the data already lives in a real database rather than needing a spreadsheet as the sync target.
 
-See `CLAUDE.md` for the current architecture and setup steps.
+See `README.md` for the current architecture and setup steps.

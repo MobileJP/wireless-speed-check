@@ -6,8 +6,6 @@ import type { Room, Scan } from "@/lib/types";
 export default function HistoryPage() {
   const [scans, setScans] = useState<Scan[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
-  const [syncing, setSyncing] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
 
   async function refresh() {
     const [scansRes, roomsRes] = await Promise.all([fetch("/api/scans"), fetch("/api/rooms")]);
@@ -29,43 +27,21 @@ export default function HistoryPage() {
     refresh();
   }
 
-  async function syncToSheets() {
-    setSyncing(true);
-    setMessage(null);
-    try {
-      const res = await fetch("/api/scans/sync", { method: "POST" });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Sync failed");
-      setMessage(
-        data.synced === 0 ? "Everything is already synced." : `Synced ${data.synced} scan(s).`
-      );
-      refresh();
-    } catch (err) {
-      setMessage(err instanceof Error ? err.message : "Sync failed");
-    } finally {
-      setSyncing(false);
-    }
-  }
-
   const sorted = [...scans].sort((a, b) => b.takenAt.localeCompare(a.takenAt));
-  const unsyncedCount = scans.filter((s) => !s.syncedAt).length;
 
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-xl font-semibold">History</h1>
-        <button
-          onClick={syncToSheets}
-          disabled={syncing}
-          className="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+        {/* File download, not a page navigation -- next/link would client-route it instead of letting the browser download it. */}
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+        <a
+          href="/api/scans/export"
+          className="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
         >
-          {syncing ? "Syncing..." : `Sync to Google Sheets${unsyncedCount ? ` (${unsyncedCount})` : ""}`}
-        </button>
+          Export CSV
+        </a>
       </div>
-
-      {message && (
-        <p className="mb-4 rounded-md bg-slate-100 px-3 py-2 text-sm text-slate-700">{message}</p>
-      )}
 
       {sorted.length === 0 ? (
         <p className="text-sm text-slate-500">No scans yet.</p>
@@ -81,7 +57,6 @@ export default function HistoryPage() {
                 <div className="text-xs text-slate-500">
                   {scan.signalPercent}%{scan.rssiDbm != null ? ` · ${scan.rssiDbm} dBm` : ""} ·{" "}
                   {new Date(scan.takenAt).toLocaleString()}
-                  {scan.syncedAt ? " · synced" : " · not synced"}
                 </div>
                 {scan.notes && <div className="mt-1 text-xs text-slate-500">{scan.notes}</div>}
               </div>

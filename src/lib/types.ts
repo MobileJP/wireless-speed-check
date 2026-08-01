@@ -17,12 +17,6 @@ export type Scan = {
   transmitRateMbps: number | null;
   notes: string;
   takenAt: string;
-  syncedAt: string | null;
-};
-
-export type Db = {
-  rooms: Room[];
-  scans: Scan[];
 };
 
 export type WifiReading = {

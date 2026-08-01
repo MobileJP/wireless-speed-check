@@ -4,7 +4,7 @@ import { addRoom, listRooms } from "@/lib/store";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  return NextResponse.json(listRooms());
+  return NextResponse.json(await listRooms());
 }
 
 export async function POST(request: NextRequest) {
@@ -13,6 +13,6 @@ export async function POST(request: NextRequest) {
   if (!name) {
     return NextResponse.json({ error: "Room name is required" }, { status: 400 });
   }
-  const room = addRoom(name);
+  const room = await addRoom(name);
   return NextResponse.json(room, { status: 201 });
 }

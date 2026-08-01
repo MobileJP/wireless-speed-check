@@ -8,6 +8,6 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  deleteRoom(id);
+  await deleteRoom(id);
   return NextResponse.json({ ok: true });
 }

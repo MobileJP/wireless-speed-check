@@ -4,7 +4,7 @@ import { addScan, listScans } from "@/lib/store";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  return NextResponse.json(listScans());
+  return NextResponse.json(await listScans());
 }
 
 export async function POST(request: NextRequest) {
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   }
-  const scan = addScan({
+  const scan = await addScan({
     roomId: body.roomId,
     ssid: body.ssid ?? null,
     signalPercent: body.signalPercent,
@@ -27,7 +27,6 @@ export async function POST(request: NextRequest) {
     transmitRateMbps: body.transmitRateMbps ?? null,
     notes: typeof body.notes === "string" ? body.notes : "",
     takenAt: new Date().toISOString(),
-    syncedAt: null,
   });
   return NextResponse.json(scan, { status: 201 });
 }
